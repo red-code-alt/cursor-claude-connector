@@ -235,6 +235,20 @@ const messagesFn = async (c: Context) => {
   const body: AnthropicRequestBody = await c.req.json()
   const isStreaming = body.stream === true
 
+  // Remove OpenAI-specific parameters that Anthropic doesn't recognize
+  // Cursor sends these as part of the OpenAI API format
+  delete body.stream_options
+  delete body.frequency_penalty
+  delete body.presence_penalty
+  delete body.logprobs
+  delete body.top_logprobs
+  delete body.logit_bias
+  delete body.n
+  delete body.seed
+  delete body.user
+  delete body.service_tier
+  delete body.parallel_tool_calls
+
   const apiKey = c.req.header('authorization')?.split(' ')?.[1]
   if (apiKey && apiKey !== process.env.API_KEY) {
     return c.json(
